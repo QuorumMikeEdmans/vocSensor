@@ -59,9 +59,10 @@ void VocSensor::onSampleTimer(void)
         // Output data to screen
         qDebug()<<"Digital value of analog input: %d \n" << raw_adc;
         qDebug()<<data[0]<<data[1];
-        float voltage=3.3f*static_cast<float>(raw_adc)/32767;
+        double voltage=3.3*static_cast<double>(raw_adc)/32767;
         qDebug()<<"Voltage:"<<voltage;
         newSample(voltage);
         sampleArray.append(Sample(voltage));
+        setVocVoltage(voltage);
     }
 }

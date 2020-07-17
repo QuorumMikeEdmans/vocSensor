@@ -9,13 +9,13 @@ class Sample : public QObject
     Q_OBJECT
 public:
     explicit Sample(QObject *parent = nullptr);
-    Sample (float voltage, QObject *parent = nullptr);
+    Sample (double voltage, QObject *parent = nullptr);
     Sample(const Sample& );
     Sample& operator=(const Sample&);
 
 signals:
     private:
-    float voltage;
+    double voltage;
     QTime sampleTime;
 
 

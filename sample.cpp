@@ -4,7 +4,7 @@ Sample::Sample(QObject *parent) : QObject(parent)
 {
 
 }
-Sample::Sample(float val, QObject *parent ) : QObject(parent)
+Sample::Sample(double val, QObject *parent ) : QObject(parent)
 {
     voltage=val;
     sampleTime=QTime::currentTime();
