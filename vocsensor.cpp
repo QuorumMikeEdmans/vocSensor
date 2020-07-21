@@ -13,14 +13,21 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <QDebug>
+#include <QFile>
+#include <QTextStream>
 
 VocSensor::VocSensor(QObject *parent) : QObject(parent)
 {
     sampleTimer = new QTimer();
 
     connect (sampleTimer,SIGNAL(timeout()),this,SLOT(onSampleTimer()));
-    sampleTimer->start(2000);
 
+}
+
+void VocSensor::setSampleIntervalms(int val){
+    sampleIntervalValuems=val;
+    sampleTimer->setInterval(sampleIntervalValuems);
+    sampleIntervalmsChanged();
 }
 
 void VocSensor::onSampleTimer(void)
@@ -64,5 +71,49 @@ void VocSensor::onSampleTimer(void)
         newSample(voltage);
         sampleArray.append(Sample(voltage));
         setVocVoltage(voltage);
+    }
+}
+
+void VocSensor::startSampling()
+{
+    sampleTimer->start(sampleIntervalms());
+}
+
+void VocSensor::stopSampling()
+{
+    sampleTimer->stop();
+}
+
+void VocSensor::clearSamples()
+{
+    sampleArray.clear();
+}
+
+void VocSensor::saveData()
+{
+    QString filename="/home/pi/vocData/";
+    if (!sampleArray.empty())
+    {
+        Sample firstSample=sampleArray[0];
+        Sample lastSample=sampleArray.last();
+        filename+=lastSample.getSampleDate().toString("d-MMM-yy");
+        filename+=lastSample.getSampleTime().toString("hh-mm-ss");
+//        filename+=firstSample.getSampleDate().toString("d-MMM-yy");
+//        filename+=firstSample.getSampleTime().toString("hh-mm");
+        filename+=".csv";
+        QFile file(filename);
+        if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+              return;
+        QTextStream out(&file);
+        out<<"Date,Time,Voltage\n";
+        for (auto &sample: sampleArray)
+        {
+            out << sample.getSampleDate().toString(("d-MMM-yy"))<<",";
+            out << sample.getSampleTime().toString(("hh:mm:ss"))<<",";
+            out << sample.getVoltage()<<"\n";
+        }
+        file.flush();
+        file.close();
+
     }
 }

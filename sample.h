@@ -12,12 +12,15 @@ public:
     Sample (double voltage, QObject *parent = nullptr);
     Sample(const Sample& );
     Sample& operator=(const Sample&);
+    QTime getSampleTime(void){return sampleTime;}
+    QDate getSampleDate(void){return sampleDate;}
+    double getVoltage(void){return voltage;}
 
 signals:
     private:
     double voltage;
     QTime sampleTime;
-
+    QDate sampleDate;
 
 public slots:
 };

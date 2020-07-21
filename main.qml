@@ -11,12 +11,14 @@ Window {
     visible: true
     width: 800
     height: 480
-    property int x:0
+    property int sampleX:0
     property real xMax:10
     property int yMax:3
     property string voltageDisplayString
     property real voltage:VocSensor.vocVoltage
     property real maxVoltage:0.5
+    property int spinBoxHeight: 40
+    property int spinBoxTextHeight:24
     title: qsTr("VOC Sensor monitor")
 
     Rectangle{
@@ -38,11 +40,6 @@ Window {
                 spacing:10
                 leftPadding: 10
                 topPadding: 50
-//                Gauge{
-//                    id: gauge
-//                    width:220
-//                    height:220
-//                }
 
                 CircularGauge {
                     id: gauge
@@ -87,7 +84,7 @@ Window {
                 Text{
                     width:100
                     height:20
-                    anchors.horizontalCenter: circularGauge.horizontalCenter
+                    anchors.horizontalCenter: gauge.horizontalCenter
                     text: voltageDisplayString
                 }
 
@@ -95,9 +92,10 @@ Window {
 
             Column
             {
+                spacing:15
                 ChartView{
                     width: 450
-                    height: 350
+                    height: 320
                     id: voltageChart
                     ValueAxis {
                           id: xAxis
@@ -117,14 +115,17 @@ Window {
                     target: VocSensor
                     onNewSample:
                     {
-                        line.append(++x,voltage)
-                        if (x > xMax)
+                        line.append(++sampleX,voltage)
+                        if (sampleX > xMax)
                             xMax = (xMax*1.5)
                         xAxis.applyNiceNumbers()
-                        console.log("New sample", x, xMax, voltage)
+                        console.log("New sample", sampleX, xMax, voltage)
                         voltageDisplayString="Voltage: "+voltage.toFixed(2) +"V"
                         if (maxVoltage<voltage)
-                            maxVoltage=voltage
+                        {
+                            maxVoltage=voltage*1.1
+                            yAxis.applyNiceNumbers()
+                        }
                     }
                 }
                 LineSeries{
@@ -134,10 +135,64 @@ Window {
                     XYPoint{x:0;y:0}
                 }
             }
-                Button{
-                    height:50
-                    width: 100
-                    text: "Save Data"
+                Row{
+                    spacing:15
+                    Text {
+                        width: 160
+                        height: spinBoxHeight
+                        text: qsTr("Sample interval/ sec:")
+                        font.pixelSize: 18
+                    }
+                    SpinBox {
+                        height: spinBoxHeight
+                        font.pixelSize: spinBoxTextHeight
+                        from: 1
+                        to: 120
+                        value:1
+                        stepSize: 1
+                        onValueChanged: {
+                            VocSensor.sampleIntervalms=1000*value
+                            if (value<10)
+                                stepSize=1;
+                            else
+                                    stepSize=10
+                        }
+                    }
+                    Button{
+                        height:50
+                        width: 60
+                        text: "Save"
+                        onClicked: VocSensor.saveData()
+                    }
+                    Button{
+                        height:50
+                        width: 60
+                        text: "Clear"
+                        onClicked:
+                        {
+                            line.clear()
+                            sampleX=0;
+                            xMax=10
+                            VocSensor.clearSamples()
+                        }
+                    }
+                }
+                Row{
+                    spacing:30
+                    anchors.horizontalCenter: parent.horizontalCenter
+
+                    Button{
+                        height:50
+                        width: 180
+                        text:"Start Sampling"
+                        onClicked: VocSensor.startSampling()
+                    }
+                    Button{
+                        height:50
+                        width: 100
+                        text:"Stop"
+                        onClicked: VocSensor.stopSampling()
+                    }
                 }
             }
         }
