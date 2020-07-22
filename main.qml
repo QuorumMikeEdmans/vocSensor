@@ -85,6 +85,7 @@ Window {
                     width:100
                     height:20
                     anchors.horizontalCenter: gauge.horizontalCenter
+                    font.pixelSize: 15
                     text: voltageDisplayString
                 }
 
@@ -95,7 +96,7 @@ Window {
                 spacing:15
                 ChartView{
                     width: 450
-                    height: 320
+                    height: 305
                     id: voltageChart
                     ValueAxis {
                           id: xAxis
@@ -159,14 +160,14 @@ Window {
                         }
                     }
                     Button{
-                        height:50
-                        width: 60
+                        height:30
+                        width: 40
                         text: "Save"
                         onClicked: VocSensor.saveData()
                     }
                     Button{
-                        height:50
-                        width: 60
+                        height:30
+                        width: 40
                         text: "Clear"
                         onClicked:
                         {
@@ -182,14 +183,14 @@ Window {
                     anchors.horizontalCenter: parent.horizontalCenter
 
                     Button{
-                        height:50
-                        width: 180
+                        height:40
+                        width: 120
                         text:"Start Sampling"
                         onClicked: VocSensor.startSampling()
                     }
                     Button{
-                        height:50
-                        width: 100
+                        height:40
+                        width: 80
                         text:"Stop"
                         onClicked: VocSensor.stopSampling()
                     }
