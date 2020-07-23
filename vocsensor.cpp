@@ -19,8 +19,10 @@
 VocSensor::VocSensor(QObject *parent) : QObject(parent)
 {
     sampleTimer = new QTimer();
-
+    stopwatchTimer = new QTimer();
+    stopwatchTimer->setSingleShot(false);
     connect (sampleTimer,SIGNAL(timeout()),this,SLOT(onSampleTimer()));
+    connect (stopwatchTimer,SIGNAL(timeout()),this,SLOT(onStopwatchTimer()));
 
 }
 
@@ -74,9 +76,18 @@ void VocSensor::onSampleTimer(void)
     }
 }
 
+void VocSensor::onStopwatchTimer()
+{
+    uint64_t timeDiffMs=startTime.msecsTo(QTime::currentTime());
+    QTime stopwatchTime=QTime::fromMSecsSinceStartOfDay(timeDiffMs);
+    setStopwatchString(stopwatchTime.toString("h:mm:ss"));
+}
+
 void VocSensor::startSampling()
 {
     sampleTimer->start(sampleIntervalms());
+    startTime=QTime::currentTime();
+    stopwatchTimer->start(100);
 }
 
 void VocSensor::stopSampling()
@@ -97,9 +108,8 @@ void VocSensor::saveData()
         Sample firstSample=sampleArray[0];
         Sample lastSample=sampleArray.last();
         filename+=lastSample.getSampleDate().toString("d-MMM-yy");
+        filename+="  ";
         filename+=lastSample.getSampleTime().toString("hh-mm-ss");
-//        filename+=firstSample.getSampleDate().toString("d-MMM-yy");
-//        filename+=firstSample.getSampleTime().toString("hh-mm");
         filename+=".csv";
         QFile file(filename);
         if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
@@ -114,6 +124,7 @@ void VocSensor::saveData()
         }
         file.flush();
         file.close();
+        newMessage("Save completed");
 
     }
 }

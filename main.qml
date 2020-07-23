@@ -19,15 +19,53 @@ Window {
     property real maxVoltage:0.5
     property int spinBoxHeight: 40
     property int spinBoxTextHeight:24
+    property bool samplingInProgress:false
+    property bool messageBoxVisible:false
+    property string messageBoxText: "Message"
+
     title: qsTr("VOC Sensor monitor")
+    onMessageBoxVisibleChanged: disappearTimer.start(5000)
+
+        Timer{
+            id: disappearTimer
+            interval:5000
+            repeat:false
+            onTriggered: messageBoxVisible=false
+        }
 
     Rectangle{
         anchors.fill: parent
         z:99
-//        color: "light blue"
         gradient: Gradient {
             GradientStop {position: 0; color: "#7FA4EF"}
             GradientStop {position: 0.5; color: "#4F81BD"}
+        }
+        Rectangle{
+            x:500
+            y:300
+            z:100
+            border.color: "black"
+            border.width: 2
+            height:60
+            width:150
+            radius:5
+            color:"lightsteelblue"
+
+            visible:messageBoxVisible
+                        Text{
+                            anchors.fill: parent
+                            anchors.margins: 10
+                            text: messageBoxText
+                        }
+                        Connections{
+                            target: VocSensor
+                            onNewMessage:
+                            {
+                                messageBoxText=message
+                                messageBoxVisible=true
+                            }
+                        }
+
         }
 
         Row{
@@ -82,12 +120,26 @@ Window {
                     }
                 }
                 Text{
+                    id: voltageTextBox
                     width:100
                     height:20
                     anchors.horizontalCenter: gauge.horizontalCenter
-                    font.pixelSize: 15
+                    font.pixelSize: 25
                     text: voltageDisplayString
                 }
+                Flasher{
+                    anchors.horizontalCenter: voltageTextBox.horizontalCenter
+                    id:flasher
+                }
+                Text {
+                    visible: samplingInProgress
+                    anchors.horizontalCenter: gauge.horizontalCenter
+                    width: 160
+                    height: spinBoxHeight
+                    text:VocSensor.stopwatchString
+                    font.pixelSize: 36
+                }
+
 
             }
 
@@ -116,6 +168,7 @@ Window {
                     target: VocSensor
                     onNewSample:
                     {
+                        flasher.blink()
                         line.append(++sampleX,voltage)
                         if (sampleX > xMax)
                             xMax = (xMax*1.5)
@@ -160,14 +213,16 @@ Window {
                         }
                     }
                     Button{
+                        id: saveButton
                         height:30
                         width: 40
                         text: "Save"
                         onClicked: VocSensor.saveData()
                     }
+
                     Button{
                         height:30
-                        width: 40
+                        width: 60
                         text: "Clear"
                         onClicked:
                         {
@@ -186,13 +241,21 @@ Window {
                         height:40
                         width: 120
                         text:"Start Sampling"
-                        onClicked: VocSensor.startSampling()
+                        onClicked:
+                        {
+                            VocSensor.startSampling()
+                            samplingInProgress=true
+                        }
                     }
                     Button{
                         height:40
                         width: 80
                         text:"Stop"
-                        onClicked: VocSensor.stopSampling()
+                        onClicked:
+                        {
+                            VocSensor.stopSampling()
+                            samplingInProgress=false
+                        }
                     }
                 }
             }
