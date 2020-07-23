@@ -138,6 +138,7 @@ Window {
                     height: spinBoxHeight
                     text:VocSensor.stopwatchString
                     font.pixelSize: 36
+                    color:"white"
                 }
 
 
