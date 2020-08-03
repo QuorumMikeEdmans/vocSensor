@@ -27,13 +27,14 @@ public:
     void setVocVoltage(double val){vocVoltageValue=val;vocVoltageChanged();}
     void setStrTextMessage(QString val){textMessage=val;strTextMessageChanged();}
     void setStopwatchString(QString val){mstrStopwatchString=val;stopwatchStringChanged();}
+    void initADC(void);
 
 
 signals:
     void strTextMessageChanged();
     void vocVoltageChanged();
     void sampleIntervalmsChanged();
-    void newSample(double voltage);
+    void newSample(double voltage, int sampleTime );
     void stopwatchStringChanged();
     void newMessage(QString message);
 

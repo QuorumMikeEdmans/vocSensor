@@ -156,7 +156,7 @@ Window {
                           min: 0
                           max: xMax
                           tickCount: 5
-                          titleText: "Samples"
+                          titleText: "Time/s"
                       }
                     ValueAxis {
                           id: yAxis
@@ -170,11 +170,10 @@ Window {
                     onNewSample:
                     {
                         flasher.blink()
-                        line.append(++sampleX,voltage)
-                        if (sampleX > xMax)
+                        line.append(sampleTime,voltage)
+                        if (sampleTime > xMax)
                             xMax = (xMax*1.5)
                         xAxis.applyNiceNumbers()
-                        console.log("New sample", sampleX, xMax, voltage)
                         voltageDisplayString="Voltage: "+voltage.toFixed(2) +"V"
                         if (maxVoltage<voltage)
                         {

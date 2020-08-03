@@ -32,7 +32,7 @@ void VocSensor::setSampleIntervalms(int val){
     sampleIntervalmsChanged();
 }
 
-void VocSensor::onSampleTimer(void)
+void VocSensor::initADC()
 {
     int file;
     if ((file = open("/dev/i2c-1", O_RDWR)) < 0)
@@ -49,12 +49,26 @@ void VocSensor::onSampleTimer(void)
     write(file, config, 1);
     sleep(1);
 
+}
+
+void VocSensor::onSampleTimer(void)
+{
+    int file;
+    if ((file = open("/dev/i2c-1", O_RDWR)) < 0)
+    {
+//        qDebug()<<"Failed to open the i2c bus";
+        return;
+    }
+    // Get I2C device, ADS1100 I2C address is 0x48(72)
+    ioctl(file, I2C_SLAVE, 0x48);
+
+
     // Read 2 bytes of data
     // raw_adc msb, raw_adc lsb
     uchar data[2]={0};
     if(read(file, data, 2) != 2)
     {
-        qDebug()<<"Error : Input/output Error";
+//        qDebug()<<"Error : Input/output Error";
     }
     else
     {
@@ -65,12 +79,10 @@ void VocSensor::onSampleTimer(void)
             raw_adc -= 65536;
         }
 
-        // Output data to screen
-        qDebug()<<"Digital value of analog input: %d \n" << raw_adc;
-        qDebug()<<data[0]<<data[1];
         double voltage=3.3*static_cast<double>(raw_adc)/32767;
-        qDebug()<<"Voltage:"<<voltage;
-        newSample(voltage);
+        int timeDiff_sec=startTime.secsTo(QTime::currentTime());
+
+        newSample(voltage, timeDiff_sec);
         sampleArray.append(Sample(voltage));
         setVocVoltage(voltage);
     }
@@ -85,14 +97,16 @@ void VocSensor::onStopwatchTimer()
 
 void VocSensor::startSampling()
 {
-    sampleTimer->start(sampleIntervalms());
     startTime=QTime::currentTime();
-    stopwatchTimer->start(100);
+    stopwatchTimer->start(1000);
+    onSampleTimer();
+    sampleTimer->start(sampleIntervalms());
 }
 
 void VocSensor::stopSampling()
 {
     sampleTimer->stop();
+    stopwatchTimer->stop();
 }
 
 void VocSensor::clearSamples()
