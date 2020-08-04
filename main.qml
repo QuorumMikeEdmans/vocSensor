@@ -12,7 +12,7 @@ Window {
     width: 800
     height: 480
     property int sampleX:0
-    property real xMax:10
+    property int xMax:10
     property int yMax:3
     property string voltageDisplayString
     property real voltage:VocSensor.vocVoltage

@@ -81,6 +81,8 @@ void VocSensor::onSampleTimer(void)
 
         double voltage=3.3*static_cast<double>(raw_adc)/32767;
         int timeDiff_sec=startTime.secsTo(QTime::currentTime());
+        if (timeDiff_sec<0)     // If running over midnight, will give negative time value
+            timeDiff_sec+=24*60*60; // Correct by adding 24 hours
 
         newSample(voltage, timeDiff_sec);
         sampleArray.append(Sample(voltage));
@@ -90,7 +92,9 @@ void VocSensor::onSampleTimer(void)
 
 void VocSensor::onStopwatchTimer()
 {
-    uint64_t timeDiffMs=startTime.msecsTo(QTime::currentTime());
+    int timeDiffMs=startTime.msecsTo(QTime::currentTime());
+    if (timeDiffMs<0)       // If running over midnight, will give negative time value
+        timeDiffMs+=24*60*60*1000;  // add 24 hours to correct
     QTime stopwatchTime=QTime::fromMSecsSinceStartOfDay(timeDiffMs);
     setStopwatchString(stopwatchTime.toString("h:mm:ss"));
 }
