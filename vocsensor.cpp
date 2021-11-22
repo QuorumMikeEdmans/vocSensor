@@ -15,6 +15,7 @@
 #include <QDebug>
 #include <QFile>
 #include <QTextStream>
+#include <QDir>
 
 VocSensor::VocSensor(QObject *parent) : QObject(parent)
 {
@@ -121,6 +122,9 @@ void VocSensor::clearSamples()
 void VocSensor::saveData()
 {
     QString filename="/home/pi/vocData/";
+    QDir dir;
+    if (!dir.exists(filename))
+        dir.mkdir(filename);
     if (!sampleArray.empty())
     {
         Sample firstSample=sampleArray[0];

@@ -192,9 +192,9 @@ Window {
                 Row{
                     spacing:15
                     Text {
-                        width: 160
+                        width: 100
                         height: spinBoxHeight
-                        text: qsTr("Sample interval/ sec:")
+                        text: qsTr("Rate / sec:")
                         font.pixelSize: 18
                     }
                     SpinBox {
@@ -215,7 +215,7 @@ Window {
                     Button{
                         id: saveButton
                         height:30
-                        width: 40
+                        width: 150
                         text: "Save"
                         onClicked: VocSensor.saveData()
                     }
@@ -240,7 +240,7 @@ Window {
                     Button{
                         height:40
                         width: 120
-                        text:"Start Sampling"
+                        text:"Start"
                         onClicked:
                         {
                             VocSensor.startSampling()
