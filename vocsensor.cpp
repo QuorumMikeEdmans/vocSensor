@@ -84,9 +84,9 @@ void VocSensor::onSampleTimer(void)
         int timeDiff_sec=startTime.secsTo(QTime::currentTime());
         if (timeDiff_sec<0)     // If running over midnight, will give negative time value
             timeDiff_sec+=24*60*60; // Correct by adding 24 hours
-        double resistance = (5-voltage)/(5*voltage);
+        double resistance = (5-voltage)/(5*voltage);        // N.B. this gives resistance / 5k - assuming that worst case R0 = 5k
         newSample(resistance, timeDiff_sec);
-        qDebug()<<"resistance, timeDiff_sec" <<resistance << timeDiff_sec;
+        qDebug()<<"voltage resistance, timeDiff_sec" << voltage <<resistance << timeDiff_sec;
         sampleArray.append(Sample(resistance));
         setVocReading(resistance);
     }
