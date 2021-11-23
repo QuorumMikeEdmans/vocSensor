@@ -14,7 +14,7 @@ CircularGauge {
     height:220
     tickmarksVisible: true
     maximumValue: 3.3
-    value: voltage
+    value: vocReading
     stepSize: 1
 
     style: CircularGaugeStyle{

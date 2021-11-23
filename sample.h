@@ -9,16 +9,16 @@ class Sample : public QObject
     Q_OBJECT
 public:
     explicit Sample(QObject *parent = nullptr);
-    Sample (double voltage, QObject *parent = nullptr);
+    Sample (double sensorReading, QObject *parent = nullptr);
     Sample(const Sample& );
     Sample& operator=(const Sample&);
     QTime getSampleTime(void){return sampleTime;}
     QDate getSampleDate(void){return sampleDate;}
-    double getVoltage(void){return voltage;}
+    double getSensorReading(void){return sensorReading;}
 
 signals:
     private:
-    double voltage;
+    double sensorReading;
     QTime sampleTime;
     QDate sampleDate;
 

@@ -12,7 +12,7 @@ class VocSensor : public QObject
 
     Q_PROPERTY(QString strTextMessage READ strTextMessage WRITE  setStrTextMessage NOTIFY strTextMessageChanged)
     Q_PROPERTY(QString stopwatchString READ stopwatchString WRITE  setStopwatchString NOTIFY stopwatchStringChanged)
-    Q_PROPERTY(double vocVoltage READ vocVoltage WRITE  setVocVoltage NOTIFY vocVoltageChanged)
+    Q_PROPERTY(double VocReading READ VocReading WRITE  setVocReading NOTIFY VocReadingChanged)
     Q_PROPERTY(int sampleIntervalms READ sampleIntervalms WRITE  setSampleIntervalms NOTIFY sampleIntervalmsChanged)
 
 public:
@@ -21,10 +21,10 @@ public:
     QTimer *stopwatchTimer;
     QString strTextMessage(void) {return textMessage;}
     QString stopwatchString(void) {return mstrStopwatchString;}
-    double vocVoltage(void){return vocVoltageValue;}
+    double VocReading(void){return VocReadingValue;}
     int sampleIntervalms(void){return sampleIntervalValuems;}
     void setSampleIntervalms(int val);
-    void setVocVoltage(double val){vocVoltageValue=val;vocVoltageChanged();}
+    void setVocReading(double val){VocReadingValue=val;VocReadingChanged();}
     void setStrTextMessage(QString val){textMessage=val;strTextMessageChanged();}
     void setStopwatchString(QString val){mstrStopwatchString=val;stopwatchStringChanged();}
     void initADC(void);
@@ -32,9 +32,9 @@ public:
 
 signals:
     void strTextMessageChanged();
-    void vocVoltageChanged();
+    void VocReadingChanged();
     void sampleIntervalmsChanged();
-    void newSample(double voltage, int sampleTime );
+    void newSample(double vocReading, int sampleTime );
     void stopwatchStringChanged();
     void newMessage(QString message);
 
@@ -49,7 +49,7 @@ public slots:
 private:
     QString textMessage=tr("");
     QVector<Sample> sampleArray;
-    double vocVoltageValue;
+    double VocReadingValue;
     int sampleIntervalValuems=1000;
     QTime startTime;
     QString mstrStopwatchString;

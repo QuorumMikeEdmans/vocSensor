@@ -6,21 +6,21 @@ Sample::Sample(QObject *parent) : QObject(parent)
 }
 Sample::Sample(double val, QObject *parent ) : QObject(parent)
 {
-    voltage=val;
+    sensorReading=val;
     sampleTime=QTime::currentTime();
     sampleDate=QDate::currentDate();
 }
 
 Sample::Sample(const Sample &sample):QObject(nullptr)
 {
-        voltage=sample.voltage;
+        sensorReading=sample.sensorReading;
         sampleTime=sample.sampleTime;
         sampleDate=sample.sampleDate;
 }
 
 Sample &Sample::Sample::operator=(const Sample &rhs)
 {
-    voltage=rhs.voltage;
+    sensorReading=rhs.sensorReading;
     sampleTime=rhs.sampleTime;
     sampleDate=rhs.sampleDate;
     return *this;

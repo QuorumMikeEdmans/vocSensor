@@ -14,9 +14,9 @@ Window {
     property int sampleX:0
     property int xMax:10
     property int yMax:3
-    property string voltageDisplayString
-    property real voltage:VocSensor.vocVoltage
-    property real maxVoltage:0.5
+    property string sensorDisplayString
+    property real vocReading:VocSensor.VocReading
+    property real maxReading:0.5
     property int spinBoxHeight: 40
     property int spinBoxTextHeight:24
     property bool samplingInProgress:false
@@ -84,12 +84,12 @@ Window {
                     width:220
                     height:220
                     tickmarksVisible: true
-                    maximumValue: 3.3
-                    value: voltage
+                    maximumValue: 10
+                    value: vocReading
                     stepSize: 0.05
 
                     style: CircularGaugeStyle{
-                        tickmarkStepSize: 0.5
+                        tickmarkStepSize: 1
                         minorTickmarkCount: 5
                         tickmarkLabel:  Text {
                             font.pixelSize: 20
@@ -120,15 +120,15 @@ Window {
                     }
                 }
                 Text{
-                    id: voltageTextBox
+                    id: vocReadingTextBox
                     width:100
                     height:20
                     anchors.horizontalCenter: gauge.horizontalCenter
                     font.pixelSize: 25
-                    text: voltageDisplayString
+                    text: sensorDisplayString
                 }
                 Flasher{
-                    anchors.horizontalCenter: voltageTextBox.horizontalCenter
+                    anchors.horizontalCenter: vocReadingTextBox.horizontalCenter
                     id:flasher
                 }
                 Text {
@@ -150,7 +150,7 @@ Window {
                 ChartView{
                     width: 450
                     height: 305
-                    id: voltageChart
+                    id: vocReadingChart
                     ValueAxis {
                           id: xAxis
                           min: 0
@@ -158,27 +158,28 @@ Window {
                           tickCount: 5
                           titleText: "Time/s"
                       }
-                    ValueAxis {
+                    LogValueAxis {
                           id: yAxis
-                          min: 0
-                          max: maxVoltage
-                          tickCount: 5
-                          titleText: "Volts"
+                          min: 0.01
+                          max: 100
+                          //tickCount: 5
+                          titleText: "Rs / Ro"
                       }
                 Connections{
                     target: VocSensor
                     onNewSample:
                     {
                         flasher.blink()
-                        line.append(sampleTime,voltage)
+                        line.append(sampleTime,vocReading)
+                        console.log(sampleTime,vocReading)
                         if (sampleTime > xMax)
                             xMax = (xMax*1.5)
                         xAxis.applyNiceNumbers()
-                        voltageDisplayString="Voltage: "+voltage.toFixed(2) +"V"
-                        if (maxVoltage<voltage)
+                        sensorDisplayString="Rs / Ro: "+vocReading.toFixed(2)
+                        if (maxReading<vocReading)
                         {
-                            maxVoltage=voltage*1.1
-                            yAxis.applyNiceNumbers()
+                            maxReading=vocReading*1.1
+//                            yAxis.applyNiceNumbers()
                         }
                     }
                 }
@@ -186,7 +187,7 @@ Window {
                     id: line
                     axisX: xAxis
                     axisY: yAxis
-                    XYPoint{x:0;y:0}
+//                    XYPoint{x:0;y:1}
                 }
             }
                 Row{
@@ -207,7 +208,7 @@ Window {
                         onValueChanged: {
                             VocSensor.sampleIntervalms=1000*value
                             if (value<10)
-                                stepSize=1;
+                                stepSizeLogarithms=1;
                             else
                                     stepSize=10
                         }

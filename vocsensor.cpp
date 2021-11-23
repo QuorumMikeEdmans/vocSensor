@@ -57,7 +57,7 @@ void VocSensor::onSampleTimer(void)
     int file;
     if ((file = open("/dev/i2c-1", O_RDWR)) < 0)
     {
-//        qDebug()<<"Failed to open the i2c bus";
+        qDebug()<<"Failed to open the i2c bus";
         return;
     }
     // Get I2C device, ADS1100 I2C address is 0x48(72)
@@ -69,7 +69,7 @@ void VocSensor::onSampleTimer(void)
     uchar data[2]={0};
     if(read(file, data, 2) != 2)
     {
-//        qDebug()<<"Error : Input/output Error";
+        qDebug()<<"Error : Input/output Error";
     }
     else
     {
@@ -84,10 +84,11 @@ void VocSensor::onSampleTimer(void)
         int timeDiff_sec=startTime.secsTo(QTime::currentTime());
         if (timeDiff_sec<0)     // If running over midnight, will give negative time value
             timeDiff_sec+=24*60*60; // Correct by adding 24 hours
-
-        newSample(voltage, timeDiff_sec);
-        sampleArray.append(Sample(voltage));
-        setVocVoltage(voltage);
+        double resistance = (5-voltage)/(5*voltage);
+        newSample(resistance, timeDiff_sec);
+        qDebug()<<"resistance, timeDiff_sec" <<resistance << timeDiff_sec;
+        sampleArray.append(Sample(resistance));
+        setVocReading(resistance);
     }
 }
 
@@ -137,12 +138,12 @@ void VocSensor::saveData()
         if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
               return;
         QTextStream out(&file);
-        out<<"Date,Time,Voltage\n";
+        out<<"Date,Time,Sensor Reading (Rs/Ro) \n";
         for (auto &sample: sampleArray)
         {
             out << sample.getSampleDate().toString(("d-MMM-yy"))<<",";
             out << sample.getSampleTime().toString(("hh:mm:ss"))<<",";
-            out << sample.getVoltage()<<"\n";
+            out << sample.getSensorReading()<<"\n";
         }
         file.flush();
         file.close();
